@@ -20,4 +20,9 @@ npm install
 npm start
 ```
 
-## Thats It !
+#### Future Scope
+1. If the repository already exists, `git pull` instead of cloning
+2. Gui for entering token
+
+
+### Thats It !
