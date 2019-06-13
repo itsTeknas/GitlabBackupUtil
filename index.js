@@ -9,7 +9,7 @@ const token = tokenJson.token;
 let Promise = require('bluebird')
 let cmd = require('node-cmd')
 
-rp.get('https://www.gitlab.com/api/v4/groups', {
+rp.get('https://www.gitlab.com/api/v4/groups\?per_page\=999', {
   json: true,
   qs: {
     simple: true,
@@ -23,7 +23,7 @@ rp.get('https://www.gitlab.com/api/v4/groups', {
   let promises = [];
   for (let gid of gids) {
     promises.push(
-      rp.get(`https://www.gitlab.com/api/v4/groups/${gid}/projects`, {
+      rp.get(`https://www.gitlab.com/api/v4/groups/${gid}/projects\?per_page\=999`, {
         json: true,
         qs: {
           simple: true,
