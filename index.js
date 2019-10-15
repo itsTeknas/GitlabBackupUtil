@@ -1,48 +1,73 @@
-'use strict';
+'use strict'
 
-let rp = require('request-promise');
-let _ = require('lodash');
-let tokenJson = require('./token')
+const rp = require('request-promise')
+const _ = require('lodash')
+const tokenJson = require('./token')
+const fs = require('fs')
 
-const token = tokenJson.token;
+const token = tokenJson.token
 
-let Promise = require('bluebird')
-let cmd = require('node-cmd')
+const Promise = require('bluebird')
+const cmd = require('node-cmd')
 
-rp.get('https://www.gitlab.com/api/v4/groups\?per_page\=999', {
-  json: true,
-  qs: {
-    simple: true,
+const HTTP = 'http'
+const SSH = 'ssh'
+
+const config = {
+  [HTTP]: {
+    directoryLenght: 19,
+    projectMapping: 'http_url_to_repo'
   },
-  headers: {
-    'PRIVATE-TOKEN': token
-  }
-}).then(groups => {
-  let gids = _.map(groups, 'id')
-  let pgits = [];
-  let promises = [];
-  for (let gid of gids) {
-    promises.push(
-      rp.get(`https://www.gitlab.com/api/v4/groups/${gid}/projects\?per_page\=999`, {
-        json: true,
-        qs: {
-          simple: true,
-        },
-        headers: {
-          'PRIVATE-TOKEN': token
-        }
-      }).then(projects => {
-        let ps = _.map(projects, 'http_url_to_repo')
-        for (let p of ps) {
-          pgits.push(p);
-        }
-      })
-    )
-  }
-  Promise.all(promises).then(() => {
-    console.log(pgits);
-    for (let git of pgits) {
-      cmd.run(`git clone ${git} backup/${git.substring(19,git.length-4)}`);
+  [SSH]: {
+    directoryLenght: 15,
+    projectMapping: 'ssh_url_to_repo'
+  },
+}[SSH]
+
+const getBackupDirectory = git => `backup/${git.substring(config.directoryLenght,git.length-4)}`
+
+const app = async () => {
+  const groups = await rp.get('https://www.gitlab.com/api/v4/groups\?per_page\=999', {
+    json: true,
+    qs: {
+      simple: true,
+    },
+    headers: {
+      'PRIVATE-TOKEN': token
     }
-  });
-})
+  })
+  
+  const gids = _.map(groups, 'id')
+  const promises = gids.map(async gid => {
+    const projects = await rp.get(`https://www.gitlab.com/api/v4/groups/${gid}/projects\?per_page\=999`, {
+      json: true,
+      qs: {
+        simple: true,
+      },
+      headers: {
+        'PRIVATE-TOKEN': token
+      }
+    })
+
+    return _.map(projects, config.projectMapping)
+  })
+
+  const result = await Promise.all(promises)
+
+  const pgits = result.reduce((prev, next) => {
+    next.forEach(p => {
+      prev.push(p)
+    })
+    return prev
+  }, [])
+
+  console.log(pgits)
+  const pgitsFiltered = pgits.filter(git => !fs.existsSync(getBackupDirectory(git)))
+
+  pgitsFiltered.forEach(git => {
+    console.log(git)
+    cmd.run(`git clone ${git} ${getBackupDirectory(git)}`)
+  })
+}
+
+app()
