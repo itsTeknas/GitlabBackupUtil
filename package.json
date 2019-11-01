@@ -4,7 +4,9 @@
   "description": "A small utility to backup or clone all projects you have on gitlab.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "lint": "eslint ./",
+    "lint:fix": "eslint ./ --fix"
   },
   "repository": {
     "type": "git",
@@ -13,10 +15,13 @@
   "author": "Sanket Berde",
   "license": "Apache-2.0",
   "dependencies": {
-    "bluebird": "^3.5.3",
+    "bluebird": "^3.7.1",
     "lodash": "^4.17.13",
     "node-cmd": "^3.0.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.6.0"
   }
 }
