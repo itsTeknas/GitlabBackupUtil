@@ -45,6 +45,6 @@ const token = tokenJson.token;
   for (let git of pgits) {
     const repoName = git.substring(19, git.length - 4)
     console.log(`Cloning ${repoName}`)
-    const stdout = await cmdAsync(`git clone ${git} backup/${repoName}`)
+    const stdout = await cmdAsync(`git clone ${git} backup/${repoName}`).catch(console.log)
   }
 })()
