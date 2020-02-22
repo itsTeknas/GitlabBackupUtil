@@ -1,14 +1,38 @@
 'use strict'
 
-const rp = require('request-promise');
-const _ = require('lodash');
-const tokenJson = require('./token');
-const cmd = require('node-cmd');
-const Promise = require('bluebird');
-const cmdAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd });
-const token = tokenJson.token;
+const rp = require('request-promise')
+const _ = require('lodash')
+const Promise = require('bluebird')
+const cmd = require('node-cmd')
+const cmdAsync = Promise.promisify(cmd.get, { multiArgs: true, context: cmd })
+const cliProgress = require('cli-progress');
 
 (async () => {
+
+  let argv = require('yargs')
+    .usage('Utility to backup all gitlab repos to a local directory')
+    .option('token', {
+      alias: 't',
+      type: 'string',
+      description: 'Gitlab Token'
+    })
+    .option('output', {
+      alias: 'o',
+      type: 'string',
+      description: 'Backup to output directory, defaults to ./gitlab-backup'
+    })
+    .option('verbose', {
+      alias: 'v',
+      type: 'boolean',
+      description: 'Enable verbose output'
+    })
+    .help(true)
+    .argv
+
+  if (!argv.token) {
+    console.log('Please pass your gitlab token using the --token flag,\nGet your token at https://gitlab.com/profile/personal_access_tokens\n\npass --help for full help\n\n')
+    process.exit(1)
+  }
 
   let groups = await rp.get('https://www.gitlab.com/api/v4/groups?per_page=999', {
     json: true,
@@ -16,10 +40,12 @@ const token = tokenJson.token;
       simple: true,
     },
     headers: {
-      'PRIVATE-TOKEN': token
+      'PRIVATE-TOKEN': argv.token
     }
   })
-  console.log(`Got groups:\n`, groups.map(g => g.name))
+  if (argv.verbose) {
+    console.log('Got groups:\n', groups.map(g => g.name))
+  }
   let gids = _.map(groups, 'id')
   let pgits = []
   for (let gid of gids) {
@@ -29,7 +55,7 @@ const token = tokenJson.token;
         simple: true,
       },
       headers: {
-        'PRIVATE-TOKEN': token
+        'PRIVATE-TOKEN': argv.token
       }
     })
     let ps = _.map(projects, 'http_url_to_repo')
@@ -39,12 +65,23 @@ const token = tokenJson.token;
     }
   }
 
-  console.log("Backing up following repos")
-  console.log(pgits)
-
-  for (let git of pgits) {
-    const repoName = git.substring(19, git.length - 4)
-    console.log(`Cloning ${repoName}`)
-    const stdout = await cmdAsync(`git clone ${git} backup/${repoName}`)
+  if (argv.verbose) {
+    console.log('Backing up following repos')
+    console.log(pgits)
   }
+
+  const cloneProgressBar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic)
+  cloneProgressBar.start(pgits.length, 0)
+
+  let index = 0
+  for (let repo of pgits) {
+    const repoName = repo.substring(19, repo.length - 4)
+    console.log(`Cloning ${repoName}`)
+    const stdout = await cmdAsync(`git clone ${repo} ${argv.output || 'gitlab-backup'}/${repoName}`)
+    // console.log(stdout)
+    index++
+    cloneProgressBar.update(index)
+  }
+
+  cloneProgressBar.stop()
 })()

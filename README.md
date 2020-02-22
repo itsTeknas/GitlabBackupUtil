@@ -1,23 +1,15 @@
 # GitlabBackupUtil
 
 A Small utility to backup all of your gitlab repositories to local filesystem.
+You never know when international laws change and you loose access to your repos.
 
-Before running the script, make sure you have persisted authentication on local cli with gitlab.
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">It is painful for me to hear how trade restrictions have hurt people. We have gone to great lengths to do no more than what is required by the law, but of course people are still affected. GitHub is subject to US trade law, just like any company that does business in the US.</p>&mdash; Nat Friedman (@natfriedman) <a href="https://twitter.com/natfriedman/status/1155311121038864384?ref_src=twsrc%5Etfw">July 28, 2019</a></blockquote>
 
-Create a file named `token.json` with the structure
+## How to Backup 
+
 ```javascript
-{
-    "token" : "YOUR_GITLAB_TOKEN"
-}
-
-```
-
-place the file in the root directory of the project.
-
-run the following commands
-```javascript
-npm install
-npm start
+npm install -g gitlab-backup-util
+gitlab-backup-util -t 'your-gl-token-here'
 ```
 
 #### Future Scope
