@@ -77,7 +77,7 @@ const cliProgress = require('cli-progress');
   for (let repo of pgits) {
     const repoName = repo.substring(19, repo.length - 4)
     console.log(`Cloning ${repoName}`)
-    const stdout = await cmdAsync(`git clone ${repo} ${argv.output || 'gitlab-backup'}/${repoName}`)
+    const stdout = await cmdAsync(`git clone ${repo} ${argv.output || 'gitlab-backup'}/${repoName}`).catch(console.log)
     // console.log(stdout)
     index++
     cloneProgressBar.update(index)
