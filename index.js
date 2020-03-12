@@ -28,15 +28,25 @@ const cliProgress = require('cli-progress');
       type: 'boolean',
       description: 'Enable verbose output'
     })
+    .option('url', {
+      alias: 'u',
+      type: 'string',
+      description: 'Specify Gitlab instance URL'
+    })
     .help(true)
     .argv
 
+  const baseUrl = argv.url || 'https://gitlab.com';
+  if(argv.verbose){
+    console.log(`Set gitlab url to ${baseUrl}`)
+  }
+  console .log()
   if (!argv.token) {
-    console.log('Please pass your gitlab token using the --token flag,\nGet your token at https://gitlab.com/profile/personal_access_tokens\n\npass --help for full help\n\n')
+    console.log(`Please pass your gitlab token using the --token flag,\nGet your token at ${baseUrl}/profile/personal_access_tokens\n\npass --help for full help\n\n`)
     process.exit(1)
   }
 
-  let groups = await rp.get('https://www.gitlab.com/api/v4/groups?per_page=999', {
+  let groups = await rp.get(`${baseUrl}/api/v4/groups?per_page=999`, {
     json: true,
     qs: {
       simple: true,
@@ -51,7 +61,7 @@ const cliProgress = require('cli-progress');
   let gids = _.map(groups, 'id')
   let pgits = []
   for (let gid of gids) {
-    let projects = await rp.get(`https://www.gitlab.com/api/v4/groups/${gid}/projects?per_page=999`, {
+    let projects = await rp.get(`${baseUrl}/api/v4/groups/${gid}/projects?per_page=999`, {
       json: true,
       qs: {
         simple: true,
