@@ -7,9 +7,16 @@ You never know when international laws change and you loose access to your repos
 
 ## How to Backup 
 
+### Backup using http (default)
+
 ```javascript
 npm install -g gitlab-backup-util
 gitlab-backup-util -t 'your-gl-token-here'
+```
+
+### Backup using ssh
+```javascript
+gitlab-backup-util -t 'your-gl-token-here' -m ssh
 ```
 
 #### Future Scope
