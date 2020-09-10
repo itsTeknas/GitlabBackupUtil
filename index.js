@@ -50,10 +50,8 @@ const cliProgress = require('cli-progress');
     console.log(`Please pass your gitlab token using the --token flag,\nGet your token at ${baseUrl}/profile/personal_access_tokens\n\npass --help for full help\n\n`)
     process.exit(1)
   }
-  console.log(argv.method)
 
   const method = argv.method == 'ssh' ? 'ssh_url_to_repo' : 'http_url_to_repo'
-  console.log(method)
   let groups = await rp.get(`${baseUrl}/api/v4/groups?per_page=999`, {
     json: true,
     qs: {
