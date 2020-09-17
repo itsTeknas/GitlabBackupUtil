@@ -1,6 +1,6 @@
 {
   "name": "gitlab-backup-util",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A small utility to backup or clone all projects you have on gitlab.",
   "main": "index.js",
   "bin": {
@@ -19,14 +19,14 @@
   "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "^3.7.2",
-    "cli-progress": "^3.6.0",
-    "lodash": "^4.17.15",
+    "cli-progress": "^3.8.2",
+    "lodash": "^4.17.20",
     "node-cmd": "^3.0.0",
     "request": "^2.88.2",
-    "request-promise": "^4.2.5",
-    "yargs": "^15.1.0"
+    "request-promise": "^4.2.6",
+    "yargs": "^16.0.3"
   },
   "devDependencies": {
-    "eslint": "^6.8.0"
+    "eslint": "^7.9.0"
   }
 }
