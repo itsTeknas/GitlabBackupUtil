@@ -93,7 +93,7 @@ const cliProgress = require('cli-progress');
 
   let index = 0
   for (let repo of pgits) {
-    const repoName = repo.substring(19, repo.length - 4)
+    const repoName = repo.substring(argv.method == 'ssh' ? 15 : 19, repo.length - 4)
     console.log(`Cloning ${repoName}`)
     const stdout = await cmdAsync(`git clone ${repo} ${argv.output || 'gitlab-backup'}/${repoName}`).catch(console.log)
     // console.log(stdout)
