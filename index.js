@@ -144,7 +144,7 @@ const cliProgress = require('cli-progress');
       )
     }
 
-    cloneProgressBar.update(index++)
+    cloneProgressBar.update(++index)
   }
 
   cloneProgressBar.stop()
