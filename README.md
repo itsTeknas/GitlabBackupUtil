@@ -20,7 +20,7 @@ gitlab-backup-util -t 'your-gl-token-here' -m ssh
 ```
 
 #### Future Scope
-* - [ ] If the repository already exists, `git pull` instead of cloning
+* - [✔] If the repository already exists, `git pull` instead of cloning
 * - [ ] Gui for entering token
 
 
