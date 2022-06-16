@@ -133,13 +133,13 @@ const cliProgress = require('cli-progress');
         console.error(`Path ${repoPath} exist and not a directory. Skipped.`)
       } else {
         console.log(`Pulling ${repoName}`)
-        const stdout = await cmdAsync(`git -C ${repoPath} pull`).catch(
+        const stdout = await cmdAsync(`git -C "${repoPath}" pull`).catch(
           console.log
         )
       }
     } else {
       console.log(`Cloning ${repoName}`)
-      const stdout = await cmdAsync(`git clone ${repo} ${repoPath}`).catch(
+      const stdout = await cmdAsync(`git clone ${repo} "${repoPath}"`).catch(
         console.log
       )
     }
