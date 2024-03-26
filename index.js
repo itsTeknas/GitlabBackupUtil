@@ -46,7 +46,7 @@ const cliProgress = require('cli-progress');
 
   const baseUrl = argv.url || 'https://gitlab.com'
   if(argv.verbose){
-    console.log(`Set gitlab url to ${baseUrl}`)
+    console.log(`Set gitlab base url to ${baseUrl}`)
   }
   console.log()
   if (!argv.token) {
@@ -73,20 +73,21 @@ const cliProgress = require('cli-progress');
   }
 
   const personalProjects = await rp.get(
-    `${baseUrl}/api/v4/users/${user.id}/projects`,
+    `${baseUrl}/api/v4/users/${user.id}/projects?per_page=100`,
     requestOptions
   )
   if (argv.verbose) {
     console.log(
       'Got personal projects:\n',
+      // personalProjects
       personalProjects.map(p => p.name)
     )
   }
 
-  let pgits = _.map(personalProjects, 'http_url_to_repo')
+  let pgits = _.map(personalProjects, method)
 
   const groups = await rp.get(
-    `${baseUrl}/api/v4/groups?per_page=999`,
+    `${baseUrl}/api/v4/groups?per_page=100`,
     requestOptions
   )
 
@@ -100,7 +101,7 @@ const cliProgress = require('cli-progress');
   const gids = _.map(groups, 'id')
   for (let gid of gids) {
     let projects = await rp.get(
-      `${baseUrl}/api/v4/groups/${gid}/projects?per_page=999`,
+      `${baseUrl}/api/v4/groups/${gid}/projects?per_page=100`,
       requestOptions
     )
     let ps = _.map(projects, method)
@@ -133,13 +134,14 @@ const cliProgress = require('cli-progress');
         console.error(`Path ${repoPath} exist and not a directory. Skipped.`)
       } else {
         console.log(`Pulling ${repoName}`)
-        const stdout = await cmdAsync(`git -C ${repoPath} pull`).catch(
+        const stdout = await cmdAsync(`git -C "${repoPath}" pull`).catch(
           console.log
         )
       }
     } else {
       console.log(`Cloning ${repoName}`)
       const stdout = await cmdAsync(`git clone --mirror ${repo} ${repoPath}.git`).catch(
+
         console.log
       )
     }
